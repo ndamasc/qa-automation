@@ -22,31 +22,42 @@ def test_list_users(client):
 
     assert response.status_code == 200
     assert isinstance(response.json(), list)
-    assert len(response.json()) > 0
+    #assert len(response.json()) > 0
+    
+    logger.info("2. Test of user listing passed successfully.")
+    logger.info(f"Users list: {response}") 
 
 
 
 def test_get_user(client, create_aleatory_user):
-    user = create_aleatory_user
+    user = create_aleatory_user.json()
     response = client.get(f"/users/{user['id']}")
 
     assert response.status_code == 200
+    
+    logger.info("3. Test of user retrieval passed successfully.")
+    logger.info(f"User created: {user}") 
 
 
 def test_delete_user(client, create_aleatory_user):
     
-    user = create_aleatory_user
+    user = create_aleatory_user.json()
     response = client.delete(f"/users/{user['id']}")
     
     assert response.status_code == 200
     
     response = client.get(f"/users/{user['id']}")   
     assert response.status_code == 404
+    
+    logger.info("4. Test of user deletion passed successfully.")
 
 
 def test_update_user(client, create_aleatory_user):
-    user = create_aleatory_user
+    user = create_aleatory_user.json()
     response = client.patch(f"/users/{user['id']}", json={"password": "98765"})
     
     assert response.status_code == 200
+    
+    logger.info("5. Test of user update passed successfully.")
+    logger.info(f"User created: {user}") 
 

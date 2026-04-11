@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from api.db.session import get_db
 
 from api.schemas.user_schema import UserCreate, UserResponse, UserUpdate
 from api.services import user_service
@@ -7,12 +8,7 @@ from api.db.session import SessionLocal
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
         
 @router.post("/", response_model=UserResponse)
 def create(user: UserCreate, db: Session = Depends(get_db)):

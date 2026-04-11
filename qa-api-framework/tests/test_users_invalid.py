@@ -1,6 +1,7 @@
-def test_create_user_duplicate_email(client):
-    
-    user = {"name": "Test", "email": "invalido@example.com", "password": "password"}
+from api.db.models.user_model import User
+
+def test_create_user_duplicate_email(client, existing_user):
+    user = existing_user
     response = client.post("/users/", json=user)
 
     assert response.status_code in [400, 409]

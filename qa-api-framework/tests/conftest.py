@@ -7,20 +7,28 @@ from faker import Faker
 from api.main import app
 from api.db.base import Base
 from api.db.session import get_db
-from config import TEST_DATABASE_URL # banco de teste
+from config import TEST_DATABASE_URL
+from api.db.models.user_model import User
 
 fake = Faker('pt_BR')
 
-engine = create_engine(TEST_DATABASE_URL,connect_args={"check_same_thread": False})
-
+engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
+
+# 🔹 cria tabela UMA vez só
+@pytest.fixture(scope="session", autouse=True)
+def setup_database():
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
+
+
+# 🔹 rollback por teste
 @pytest.fixture(scope="function")
 def db():
     connection = engine.connect()
     transaction = connection.begin()
-
-    Base.metadata.create_all(bind=connection)  # 🔥 FALTAVA ISSO
 
     session = TestingSessionLocal(bind=connection)
 
@@ -30,6 +38,7 @@ def db():
     transaction.rollback()
     connection.close()
 
+
 @pytest.fixture(scope="function")
 def client(db):
     def override_get_db():
@@ -37,11 +46,9 @@ def client(db):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    yield TestClient(app)
+    with TestClient(app) as client:
+        yield client
 
-    app.dependency_overrides.clear()
-
-    
 
 @pytest.fixture(scope="function")
 def create_aleatory_user(client):
@@ -49,7 +56,15 @@ def create_aleatory_user(client):
         "name": fake.first_name(),
         "email": fake.email(),
         "password": "012345"
-        }
-    
+    }
+
     response = client.post("/users/", json=user)
     return response
+
+
+@pytest.fixture(scope="function")
+def existing_user(db):
+    user = User(name="Existing", email="invalido@example.com", password="password")
+    db.add(user)
+    db.commit()
+    return {"name": "Test", "email": "invalido@example.com", "password": "password"}
