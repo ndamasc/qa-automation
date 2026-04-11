@@ -6,3 +6,6 @@ logging.basicConfig(
     )
 
 logger = logging.getLogger(__name__)
+logger.propagate = False
+
+#logging.getLogger("httpx").setLevel(logging.WARNING)

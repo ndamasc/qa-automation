@@ -7,6 +7,7 @@ from faker import Faker
 from api.main import app
 from api.db.base import Base
 from api.db.session import get_db
+from api.services.user_service import hash_password
 from config import TEST_DATABASE_URL
 from api.db.models.user_model import User
 
@@ -55,16 +56,19 @@ def create_aleatory_user(client):
     user = {
         "name": fake.first_name(),
         "email": fake.email(),
-        "password": "012345"
+        "password": "012345678"  # At least 8 chars
     }
 
     response = client.post("/users/", json=user)
+    assert response.status_code == 201  # Created
     return response
 
 
 @pytest.fixture(scope="function")
 def existing_user(db):
-    user = User(name="Existing", email="invalido@example.com", password="password")
+
+    hashed_password = hash_password("password")
+    user = User(name="Existing", email="existing@example.com", password=hashed_password)
     db.add(user)
     db.commit()
-    return {"name": "Test", "email": "invalido@example.com", "password": "password"}
+    return {"name": "Existing", "email": "existing@example.com", "password": "password"}

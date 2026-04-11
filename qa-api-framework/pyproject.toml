@@ -10,4 +10,16 @@ dependencies = [
     "requests>=2.33.1",
     "sqlalchemy>=2.0.48",
     "uvicorn>=0.42.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-dotenv>=1.0.0",
+    "email-validator>=2.1.0",
+    "faker>=40.13.0",
+    "psycopg2-binary>=2.9.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "faker>=40.13.0",
+    "python-dotenv>=1.0.0",
 ]
