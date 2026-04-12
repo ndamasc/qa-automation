@@ -25,7 +25,6 @@ def setup_database():
     Base.metadata.drop_all(bind=engine)
 
 
-# 🔹 rollback por teste
 @pytest.fixture(scope="function")
 def db():
     connection = engine.connect()
@@ -36,7 +35,6 @@ def db():
     yield session
 
     session.close()
-    transaction.rollback()
     connection.close()
 
 
