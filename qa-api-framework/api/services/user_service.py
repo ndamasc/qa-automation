@@ -5,6 +5,9 @@ from api.db.models.user_model import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
+print("🔥 USER_SERVICE CARREGADO")
+
 def create_user(db: Session, name: str, email: str, password: str) -> User | None:
     """Create a new user with hashed password and email uniqueness validation."""
     hashed_password = _safe_hash(password)
@@ -63,14 +66,44 @@ def delete_user(db: Session, user_id: int) -> bool:
     return True
 
 
+# def _safe_hash(password: str) -> str:
+#     print("PASSWORD RECEBIDO:", password)
+#     print("TIPO:", type(password))
+#     print("BYTES:", len(password.encode("utf-8")))
+
+#     if not password:
+#         raise ValueError("Password cannot be empty")
+    
+#     if len(password.encode("utf-8")) > 72:
+#         raise ValueError("Password too long")
+
+#     password_bytes = password.encode("utf-8")[:72]
+    
+#     return pwd_context.hash(password_bytes)
+
+
+
 def _safe_hash(password: str) -> str:
+    
+    print("🔥 SAFE_HASH EXECUTOU")
+    
     if not password:
         raise ValueError("Password cannot be empty")
 
-    pwd_bytes = password.encode("utf-8")[:72]
-    safe_password = pwd_bytes.decode("utf-8", errors="ignore")
+    # 🔥 corta em bytes corretamente
+    password_bytes = password.encode("utf-8")[:72]
+
+    # 🔥 volta pra string antes de passar pro passlib
+    safe_password = password_bytes.decode("utf-8", errors="ignore")
 
     return pwd_context.hash(safe_password)
+
+#####
+
+
+
+
+
 
 def hash_password(password: str) -> str:
     return _safe_hash(password)
