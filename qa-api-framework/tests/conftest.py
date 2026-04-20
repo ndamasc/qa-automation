@@ -62,6 +62,20 @@ def create_aleatory_user(client):
     return response
 
 
+@pytest.fixture
+def create_user_e2e(api_request):
+    response = api_request.post(
+        "/users/",
+        data={
+            "name": fake.first_name(),
+            "email": fake.email(),
+            "password": "12345678"
+        }
+    )
+    return response
+
+
+
 @pytest.fixture(scope="function")
 def existing_user(db):
 
@@ -70,3 +84,14 @@ def existing_user(db):
     db.add(user)
     db.commit()
     return {"name": "Existing", "email": "existing@example.com", "password": "password"}
+
+
+@pytest.fixture
+def api_request(playwright):
+    request = playwright.request.new_context(
+        base_url="http://127.0.0.1:8000"
+    )
+
+    yield request
+
+    request.dispose()

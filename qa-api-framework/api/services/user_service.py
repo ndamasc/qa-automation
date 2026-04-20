@@ -5,6 +5,9 @@ from api.db.models.user_model import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
+print("🔥 USER_SERVICE CARREGADO")
+
 def create_user(db: Session, name: str, email: str, password: str) -> User | None:
     """Create a new user with hashed password and email uniqueness validation."""
     hashed_password = _safe_hash(password)
@@ -25,26 +28,34 @@ def list_users(db: Session) -> list[User]:
     return db.query(User).all()
 
 
-def update_user(db: Session, user_id: int, **kwargs) -> User | None:
-    """Update user fields. Password will be hashed if provided."""
-    user = get_user(db, user_id)
-    
+def update_user(db, user_id, name=None, email=None, password=None):
+    user = db.query(User).filter(User.id == user_id).first()
+
     if not user:
         return None
-    
-    for field, value in kwargs.items():
-        if value is not None:
-            if field == "password":
-                value = _safe_hash(value)
-            setattr(user, field, value)
-    
-    try:
-        db.commit()
-        db.refresh(user)
-        return user
-    except IntegrityError:
-        db.rollback()
-        return None
+
+    if email:
+        email_exists = (
+            db.query(User)
+            .filter(User.email == email, User.id != user_id)
+            .first()
+        )
+
+        if email_exists:
+            raise ValueError("Email already exists")
+
+        user.email = email
+
+    if name:
+        user.name = name
+
+    if password:
+        user.password = hash_password(password)
+
+    db.commit()
+    db.refresh(user)
+
+    return user
 
 
 def get_user(db: Session, user_id: int) -> User | None:
@@ -63,14 +74,42 @@ def delete_user(db: Session, user_id: int) -> bool:
     return True
 
 
+# def _safe_hash(password: str) -> str:
+#     print("PASSWORD RECEBIDO:", password)
+#     print("TIPO:", type(password))
+#     print("BYTES:", len(password.encode("utf-8")))
+
+#     if not password:
+#         raise ValueError("Password cannot be empty")
+    
+#     if len(password.encode("utf-8")) > 72:
+#         raise ValueError("Password too long")
+
+#     password_bytes = password.encode("utf-8")[:72]
+    
+#     return pwd_context.hash(password_bytes)
+
+
+
 def _safe_hash(password: str) -> str:
+
     if not password:
         raise ValueError("Password cannot be empty")
 
-    pwd_bytes = password.encode("utf-8")[:72]
-    safe_password = pwd_bytes.decode("utf-8", errors="ignore")
+    # 🔥 corta em bytes corretamente
+    password_bytes = password.encode("utf-8")[:72]
+
+    # 🔥 volta pra string antes de passar pro passlib
+    safe_password = password_bytes.decode("utf-8", errors="ignore")
 
     return pwd_context.hash(safe_password)
+
+#####
+
+
+
+
+
 
 def hash_password(password: str) -> str:
     return _safe_hash(password)
