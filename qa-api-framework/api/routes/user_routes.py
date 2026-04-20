@@ -35,15 +35,34 @@ def get(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
+# user_routes.py
+
 @router.patch("/{user_id}", response_model=UserResponse)
 def patch(user_id: int, user_data: UserUpdate, db: Session = Depends(get_db)):
     """Update a user partially."""
-    user = user_service.update_user(db, user_id, name=user_data.name, email=user_data.email, password=user_data.password)
-    
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found or email already exists")
-    
-    return user
+
+    try:
+        user = user_service.update_user(
+            db,
+            user_id,
+            name=user_data.name,
+            email=user_data.email,
+            password=user_data.password
+        )
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+
+        return user
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc)
+        )
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

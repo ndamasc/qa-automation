@@ -28,26 +28,34 @@ def list_users(db: Session) -> list[User]:
     return db.query(User).all()
 
 
-def update_user(db: Session, user_id: int, **kwargs) -> User | None:
-    """Update user fields. Password will be hashed if provided."""
-    user = get_user(db, user_id)
-    
+def update_user(db, user_id, name=None, email=None, password=None):
+    user = db.query(User).filter(User.id == user_id).first()
+
     if not user:
         return None
-    
-    for field, value in kwargs.items():
-        if value is not None:
-            if field == "password":
-                value = _safe_hash(value)
-            setattr(user, field, value)
-    
-    try:
-        db.commit()
-        db.refresh(user)
-        return user
-    except IntegrityError:
-        db.rollback()
-        return None
+
+    if email:
+        email_exists = (
+            db.query(User)
+            .filter(User.email == email, User.id != user_id)
+            .first()
+        )
+
+        if email_exists:
+            raise ValueError("Email already exists")
+
+        user.email = email
+
+    if name:
+        user.name = name
+
+    if password:
+        user.password = hash_password(password)
+
+    db.commit()
+    db.refresh(user)
+
+    return user
 
 
 def get_user(db: Session, user_id: int) -> User | None:
@@ -84,9 +92,7 @@ def delete_user(db: Session, user_id: int) -> bool:
 
 
 def _safe_hash(password: str) -> str:
-    
-    print("🔥 SAFE_HASH EXECUTOU")
-    
+
     if not password:
         raise ValueError("Password cannot be empty")
 
