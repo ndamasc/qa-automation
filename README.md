@@ -1,22 +1,20 @@
 # QA API Framework 🚀
 
-API REST desenvolvida com **FastAPI + PostgreSQL + SQLAlchemy**, focada em **qualidade de software, testes automatizados e CI/CD**.
+API REST desenvolvida com **FastAPI + PostgreSQL, focada em **qualidade de software, testes automatizados e CI/CD**.
 
-Este projeto foi criado como laboratório prático para demonstrar habilidades em:
+Este projeto foi criado para prática de:
 
 - Testes de API
 - Automação com Pytest
 - E2E com Playwright
 - Banco de dados relacional
 - Arquitetura backend em Python
-- Integração contínua com GitHub Actions
-- Boas práticas de engenharia de software
 
 ---
 
 # Visão Geral
 
-A aplicação permite gerenciamento de usuários com operações CRUD:
+A aplicação permite gerenciamento de usuários com operações CRUD simples:
 
 - Criar usuário
 - Listar usuários
