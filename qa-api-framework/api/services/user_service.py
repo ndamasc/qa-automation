@@ -6,8 +6,6 @@ from api.db.models.user_model import User
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-print("🔥 USER_SERVICE CARREGADO")
-
 def create_user(db: Session, name: str, email: str, password: str) -> User | None:
     """Create a new user with hashed password and email uniqueness validation."""
     hashed_password = _safe_hash(password)
