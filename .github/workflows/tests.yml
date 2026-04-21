@@ -2,9 +2,19 @@ name: QA API Pipeline
 
 on:
   push:
-    branches: [ main, tests ]
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '.editorconfig'
+
   pull_request:
-    branches: [ main, tests ]
+    branches: [main, master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
 
 jobs:
   test:
