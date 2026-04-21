@@ -5,8 +5,6 @@ from api.db.models.user_model import User
 
 fake = Faker('pt_BR')
 
-
-
 @pytest.fixture(scope="function")
 def create_aleatory_user(client):
     user = {

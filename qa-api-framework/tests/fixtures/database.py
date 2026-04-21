@@ -33,6 +33,7 @@ def db():
 
     session.close()
     connection.close()
+    
 
 
 @pytest.fixture(scope="function")

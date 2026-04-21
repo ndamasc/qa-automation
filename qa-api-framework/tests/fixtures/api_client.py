@@ -8,3 +8,4 @@ def api_request(playwright):
 
     yield request
     request.dispose()
+    
